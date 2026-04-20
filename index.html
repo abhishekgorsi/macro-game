@@ -329,8 +329,15 @@ async function joinGame(){
   const g=snap.val();localGame=g;
   if(personalSuffix){
     const entry=g.roster&&g.roster[personalSuffix];
-    if(!entry){setErr('jn-err','Personal code not found.');return;}
-    myRole=entry.role;myGroup=entry.group;myName=entry.name;
+    if(entry){
+      myRole=entry.role;myGroup=entry.group;myName=entry.name;
+    } else {
+      const cbMatch=personalSuffix.match(/^CB(\d+)$/i);
+      const hhMatch=personalSuffix.match(/^HH(\d+)$/i);
+      if(cbMatch){myRole='cb';myGroup=parseInt(cbMatch[1]);myName=myId;}
+      else if(hhMatch){myRole='hh';myGroup=parseInt(hhMatch[1]);myName=myId;}
+      else{setErr('jn-err','Code not recognised. Ask your instructor.');return;}
+    }
   } else {
     if(!joinRole){setErr('jn-err','Select your role.');return;}
     if((joinRole==='cb'||joinRole==='hh')&&!$('jn-group').value){setErr('jn-err','Enter your group number.');return;}
