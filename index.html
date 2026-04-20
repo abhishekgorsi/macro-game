@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Macro Lab</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:#0a0f1e;color:#e8e4d9;font-family:'Georgia',serif}
+.screen{display:none;padding:16px;min-height:100vh;max-width:480px;margin:0 auto}
+.screen.active{display:block}
+h1{font-size:24px;font-weight:400;letter-spacing:.04em;color:#f0ead8;margin-bottom:6px}
+h3{font-size:11px;font-weight:700;color:#6b6254;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.logo{font-size:11px;letter-spacing:.18em;color:#4a4640;text-transform:uppercase;margin-bottom:22px;padding-top:10px}
+hr{border:none;border-top:.5px solid #1e2030;margin:16px 0}
+.card{background:#111520;border:.5px solid #1e2230;border-radius:12px;padding:16px;margin-bottom:12px}
+.card-gold{border-left:2px solid #c8a84b;border-radius:0 12px 12px 0}
+input[type=text],input[type=number],select,textarea{width:100%;background:#0a0e1a;border:.5px solid #252838;color:#e8e4d9;border-radius:8px;padding:12px 14px;font-size:15px;font-family:inherit;margin-bottom:10px;outline:none;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:#c8a84b}
+select option{background:#111520}
+textarea{resize:vertical;min-height:80px;font-size:13px}
+.btn{width:100%;padding:13px;border-radius:8px;border:none;font-size:15px;font-family:inherit;cursor:pointer;transition:opacity .15s;margin-bottom:8px}
+.btn:active{opacity:.7}
+.btn-gold{background:#c8a84b;color:#0a0f1e;font-weight:700}
+.btn-outline{background:transparent;border:.5px solid #2a2820;color:#c8c0a8}
+.btn-green{background:#1a5c3a;color:#b0f0d0;font-weight:700}
+.btn-red{background:#5c1a1a;color:#f0b0b0;font-weight:700}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.b-gold{background:#241e0a;color:#c8a84b}
+.b-green{background:#0a1e10;color:#5abf8a}
+.b-blue{background:#0a1020;color:#6a9fd8}
+.b-gray{background:#14181e;color:#606070}
+.stat-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:.5px solid #14181e;font-size:14px;gap:8px}
+.stat-row:last-child{border-bottom:none}
+.sl{color:#70708a;font-size:13px;flex-shrink:0}
+.sv{font-weight:700;color:#e8e4d9;text-align:right}
+.sv.gold{color:#c8a84b}.sv.green{color:#5abf8a}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.tbl th{color:#5a5450;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:5px 3px;border-bottom:.5px solid #1e2230;text-align:right}
+.tbl th:first-child{text-align:left}
+.tbl td{padding:7px 3px;border-bottom:.5px solid #0e1218;text-align:right;color:#9090a8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbl td:first-child{text-align:left;color:#6a6880}
+.tbl tr:last-child td{border-bottom:none}
+.payoff-big{text-align:center;padding:20px 16px;background:#080d18;border:.5px solid #1a2030;border-radius:12px;margin:10px 0}
+.payoff-num{font-size:52px;font-weight:400;letter-spacing:-.03em}
+.payoff-lbl{font-size:11px;color:#4a5050;text-transform:uppercase;letter-spacing:.12em;margin-top:6px}
+.waiting{text-align:center;padding:28px 12px}
+.spinner{width:38px;height:38px;border:1.5px solid #c8a84b;border-top-color:transparent;border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wt{font-size:14px;color:#808090;line-height:1.6}
+.ws{font-size:12px;color:#c8a84b;margin-top:10px}
+.phase-bar{display:flex;gap:5px;margin-bottom:12px}
+.pip{flex:1;height:3px;border-radius:2px;background:#14181e}
+.pip.done{background:#5abf8a}.pip.active{background:#c8a84b}
+.tabs{display:flex;gap:2px;background:#070c16;border-radius:8px;padding:3px;margin-bottom:14px}
+.tab{flex:1;padding:7px 3px;text-align:center;font-size:11px;color:#5a5460;border-radius:6px;cursor:pointer}
+.tab.active{background:#141828;color:#c0b8a8}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.rc{background:#0e1220;border:.5px solid #1e2230;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer}
+.rc.sel{border-color:#c8a84b;background:#141a28}
+.ri{font-size:24px;margin-bottom:6px}.rt{font-size:13px;font-weight:700;color:#c0b8a8}.rs{font-size:11px;color:#5a5254;margin-top:3px}
+.lb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:.5px solid #0e1218}
+.lb-rank{font-size:16px;color:#3a3830;width:22px;text-align:center;flex-shrink:0}
+.lb-rank.top{color:#c8a84b}.lb-name{flex:1;font-size:13px;color:#c0b8a8}.lb-score{font-size:14px;font-weight:700;color:#5abf8a}
+.preview-box{background:#070c16;border:.5px solid #1a2030;border-radius:8px;padding:13px;margin:8px 0}
+.preview-box.hi{border-color:#c8a84b}
+.toast-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#161c2c;border:.5px solid #2a3050;color:#c0b8b0;padding:10px 22px;border-radius:10px;font-size:13px;display:none;z-index:999;white-space:nowrap;pointer-events:none}
+.err{color:#d86a6a;font-size:13px;margin-bottom:10px;display:none;padding:8px 12px;background:#1e0a0a;border-radius:6px}
+.grp-status{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:.5px solid #0e1218;font-size:13px}
+.code-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.code-item{background:#080d18;border:.5px solid #1a2030;border-radius:8px;padding:10px;text-align:center}
+.code-val{font-size:15px;letter-spacing:.08em;color:#c8a84b;font-family:monospace;font-weight:700}
+.code-lbl{font-size:10px;color:#4a4840;text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.hist-title{font-size:11px;color:#5a5254;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;padding-top:8px;border-top:.5px solid #14181e}
+</style>
+</head>
+<body>
+
+<div class="screen active" id="s-entry">
+  <div class="logo">Macro Lab</div>
+  <h1>Monetary Policy<br>Simulation</h1>
+  <p style="font-size:13px;color:#5a5458;margin-bottom:22px;line-height:1.65">Real-time classroom experiment in inflation expectations and central banking.</p>
+  <hr>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+    <button class="btn btn-gold" onclick="showScreen('create')">Create Game<br><span style="font-size:11px;font-weight:400;opacity:.8">(Instructor)</span></button>
+    <button class="btn btn-outline" onclick="showScreen('join')">Join Game<br><span style="font-size:11px;opacity:.7">(Student)</span></button>
+  </div>
+</div>
+
+<div class="screen" id="s-create">
+  <div class="logo">New Game</div><h1>Create Game</h1>
+  <div class="card">
+    <h3>Number of groups</h3>
+    <select id="cr-ng"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10" selected>10</option></select>
+    <h3>Number of rounds</h3>
+    <select id="cr-nr"><option value="5">5 rounds</option><option value="10" selected>10 rounds</option><option value="15">15 rounds</option></select>
+  </div>
+  <div class="card">
+    <h3>Participant roster (optional)</h3>
+    <p style="font-size:12px;color:#5a5458;margin-bottom:8px;line-height:1.6">One participant per line: <span style="color:#c8a84b;font-family:monospace">Name, Group, Role</span><br>Role = cb or hh. Leave blank for open join.</p>
+    <textarea id="cr-roster" placeholder="Priya, 1, cb&#10;Rahul, 1, hh&#10;Aisha, 2, cb"></textarea>
+  </div>
+  <div class="err" id="cr-err"></div>
+  <button class="btn btn-gold" onclick="createGame()">Create Game</button>
+  <button class="btn btn-outline" onclick="showScreen('entry')">Back</button>
+</div>
+
+<div class="screen" id="s-join">
+  <div class="logo">Join Game</div><h1>Join</h1>
+  <div class="card">
+    <h3>Enter your code</h3>
+    <p style="font-size:12px;color:#5a5458;margin-bottom:10px">Room code (4 letters) or personal code from instructor.</p>
+    <input type="text" id="jn-code" placeholder="e.g. K7BQ or K7BQ-AB12" maxlength="12"
+      style="font-size:20px;letter-spacing:.15em;text-align:center;text-transform:uppercase"
+      oninput="this.value=this.value.toUpperCase();onCodeInput()">
+  </div>
+  <div id="jn-auto-card" style="display:none"><div class="card" style="background:#0a1420;border-color:#1a3040"><div id="jn-auto-msg" style="font-size:14px;color:#6a9fd8;text-align:center;padding:4px 0"></div></div></div>
+  <div id="jn-manual" style="display:none">
+    <div class="card">
+      <h3>Your role</h3>
+      <div class="role-grid">
+        <div class="rc" id="rc-cb" onclick="selRole('cb',this)"><div class="ri">&#127960;</div><div class="rt">Central Banker</div><div class="rs">1 per group</div></div>
+        <div class="rc" id="rc-hh" onclick="selRole('hh',this)"><div class="ri">&#127968;</div><div class="rt">Household</div><div class="rs">6 per group</div></div>
+        <div class="rc" id="rc-spec" onclick="selRole('spectator',this)" style="grid-column:1/-1"><div class="ri">&#128202;</div><div class="rt">Spectator / Projector</div><div class="rs">View only</div></div>
+      </div>
+      <div id="jn-grp-row" style="display:none"><h3>Group number</h3><input type="number" id="jn-group" placeholder="e.g. 3" min="1" max="10"></div>
+      <div id="jn-name-row" style="display:none"><h3>Your name (optional)</h3><input type="text" id="jn-name" placeholder="e.g. Priya"></div>
+    </div>
+  </div>
+  <div class="err" id="jn-err"></div>
+  <button class="btn btn-gold" onclick="joinGame()">Join Game</button>
+  <button class="btn btn-outline" onclick="showScreen('entry')">Back</button>
+</div>
+
+<div class="screen" id="s-master">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding-top:10px">
+    <div class="logo" style="margin-bottom:0">Master Controller</div>
+    <span class="badge b-gold" id="mc-code-badge"></span>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="mcTab('ctrl',this)">Control</div>
+    <div class="tab" onclick="mcTab('codes',this)">Codes</div>
+    <div class="tab" onclick="mcTab('groups',this)">Groups</div>
+    <div class="tab" onclick="mcTab('board',this)">Board</div>
+    <div class="tab" onclick="mcTab('data',this)">Data</div>
+  </div>
+  <div id="mc-ctrl">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:13px;color:#70708a">Active round</span>
+        <span class="badge b-gold" id="mc-rnd-badge">Round 1/10</span>
+      </div>
+      <div class="phase-bar" id="mc-pips"><div class="pip active"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div>
+      <div id="mc-ph-label" style="font-size:13px;color:#c8a84b;margin-bottom:3px"></div>
+      <div id="mc-ph-desc" style="font-size:12px;color:#4a4850"></div>
+    </div>
+    <div class="card" id="mc-p1"><h3>Household submissions</h3><div id="mc-hh-prog" style="font-size:12px;color:#6b6254;margin-bottom:12px"></div><button class="btn btn-gold" onclick="mcAdvance()">Advance to Shock Phase</button></div>
+    <div class="card" id="mc-p2" style="display:none"><h3>Set shock value (e)</h3><p style="font-size:13px;color:#70708a;margin-bottom:10px">Positive = expansionary. Negative = contractionary.</p><input type="number" id="mc-shock-in" placeholder="e.g. 0.5 or -1.0" step="0.1"><button class="btn btn-gold" onclick="mcReleaseShock()">Release Shock to All Groups</button></div>
+    <div class="card" id="mc-p3" style="display:none"><div class="waiting" style="padding:14px"><div class="spinner"></div><div class="wt">Waiting for central bankers...</div><div class="ws" id="mc-cb-prog"></div></div><button class="btn btn-green" id="mc-reveal-btn" style="display:none;margin-top:4px" onclick="mcReveal()">Reveal Results to All Groups</button></div>
+    <div class="card" id="mc-p4" style="display:none"><h3>Round results</h3><div id="mc-res-body"></div><div style="height:12px"></div><button class="btn btn-gold" id="mc-next-btn" onclick="mcNext()">Start Next Round</button><button class="btn btn-outline" onclick="mcEnd()">End Game</button></div>
+    <div class="card" id="mc-over" style="display:none"><h3>Game complete</h3><p style="font-size:13px;color:#70708a;margin-bottom:14px">All rounds finished.</p><button class="btn btn-gold" onclick="doExcel()">Download Excel Data</button><button class="btn btn-red" onclick="mcReset()">Reset / New Game</button></div>
+  </div>
+  <div id="mc-codes" style="display:none">
+    <div class="card"><h3>Room code (open join)</h3><div style="font-size:36px;letter-spacing:.2em;color:#c8a84b;text-align:center;padding:14px 0;font-family:monospace;font-weight:700" id="mc-main-code"></div><p style="font-size:12px;color:#5a5458;text-align:center">Students enter this + choose their own role and group</p></div>
+    <div class="card"><h3>Personal codes (auto-assign role + group)</h3><p style="font-size:12px;color:#5a5458;margin-bottom:12px">Each code auto-assigns role and group when entered.</p><div class="code-grid" id="mc-code-grid"></div></div>
+    <button class="btn btn-outline" onclick="copyAllCodes()">Copy All Codes as Text</button>
+  </div>
+  <div id="mc-groups" style="display:none"><div class="card"><h3>Groups - <span id="mc-grp-count">0</span> active</h3><div id="mc-groups-body"></div></div></div>
+  <div id="mc-board" style="display:none">
+    <div class="card"><h3>CB leaderboard - cumulative payoff</h3><div id="mc-lb-cb"></div></div>
+    <div class="card"><h3>Avg inflation expectations by round</h3>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Rnd</th><th>G1</th><th>G2</th><th>G3</th><th>G4</th><th>G5</th></tr></thead><tbody id="mc-exp-a"></tbody></table></div>
+      <div style="overflow-x:auto;margin-top:8px"><table class="tbl"><thead><tr><th>Rnd</th><th>G6</th><th>G7</th><th>G8</th><th>G9</th><th>G10</th></tr></thead><tbody id="mc-exp-b"></tbody></table></div>
+    </div>
+  </div>
+  <div id="mc-data" style="display:none">
+    <div class="card"><h3>Full round history</h3><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Rnd</th><th>Grp</th><th>AvgExp</th><th>Shock</th><th>Rate</th><th>Pi</th><th>Gap</th><th>CB+</th></tr></thead><tbody id="mc-data-body"></tbody></table></div></div>
+    <button class="btn btn-gold" onclick="doExcel()">Download Excel Data</button>
+  </div>
+</div>
+
+<div class="screen" id="s-cb">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-bottom:20px">
+    <div class="logo" style="margin-bottom:0">Central Banker</div>
+    <span class="badge b-blue" id="cb-grp-badge"></span>
+  </div>
+  <div id="cb-wait" class="waiting"><div class="spinner"></div><div class="wt" id="cb-wait-msg">Waiting...</div><div class="ws" id="cb-wait-sub"></div></div>
+  <div id="cb-decide" style="display:none">
+    <div class="card card-gold">
+      <h3>Round <span id="cb-rnd-num"></span> - set interest rate</h3>
+      <div class="stat-row"><span class="sl">Avg. expectation</span><span class="sv gold" id="cb-avg-exp">-</span></div>
+      <div class="stat-row"><span class="sl">Shock (e)</span><span class="sv" id="cb-shock-val">-</span></div>
+      <div class="stat-row"><span class="sl">Current rate (i)</span><span class="sv" id="cb-cur-rate">-</span></div>
+    </div>
+    <div class="card">
+      <h3>Change in interest rate (Di)</h3>
+      <p style="font-size:13px;color:#5a5860;margin-bottom:10px">Positive = tighten. Negative = ease.</p>
+      <input type="number" id="cb-delta-in" placeholder="e.g. 0.5 or -0.25" step="0.25" oninput="cbPreview()">
+      <div class="preview-box hi" id="cb-prev" style="display:none">
+        <div class="stat-row"><span class="sl">New interest rate</span><span class="sv" id="pv-rate">-</span></div>
+        <div class="stat-row"><span class="sl">Output gap</span><span class="sv" id="pv-gap">-</span></div>
+        <div class="stat-row"><span class="sl">Inflation</span><span class="sv" id="pv-inf">-</span></div>
+        <div class="stat-row"><span class="sl">My payoff</span><span class="sv gold" id="pv-pay">-</span></div>
+      </div>
+      <button class="btn btn-gold" id="cb-fin-btn" disabled onclick="cbFinalise()">Finalise Decision</button>
+    </div>
+    <div class="card" id="cb-hist-decide-card" style="display:none">
+      <div class="hist-title">Round history</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Rnd</th><th>Shock</th><th>Rate</th><th>Pi</th><th>Gap</th><th>Pay</th><th>Cum.</th></tr></thead><tbody id="cb-hist-decide"></tbody></table></div>
+    </div>
+  </div>
+  <div id="cb-res" style="display:none">
+    <span class="badge b-gold" id="cb-res-badge"></span>
+    <div class="payoff-big" style="margin-top:10px"><div class="payoff-num" id="cb-pay-num">-</div><div class="payoff-lbl">Payoff this round</div></div>
+    <div class="card">
+      <div class="stat-row"><span class="sl">Interest rate</span><span class="sv" id="cb-r-rate">-</span></div>
+      <div class="stat-row"><span class="sl">Output gap</span><span class="sv" id="cb-r-gap">-</span></div>
+      <div class="stat-row"><span class="sl">Actual inflation</span><span class="sv gold" id="cb-r-inf">-</span></div>
+      <div class="stat-row"><span class="sl">Cumulative payoff</span><span class="sv green" id="cb-r-cum">-</span></div>
+    </div>
+    <div class="card">
+      <div class="hist-title">Round history</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Rnd</th><th>Shock</th><th>Rate</th><th>Pi</th><th>Gap</th><th>Pay</th><th>Cum.</th></tr></thead><tbody id="cb-hist"></tbody></table></div>
+    </div>
+    <div class="waiting"><div class="wt">Waiting for next round...</div></div>
+  </div>
+</div>
+
+<div class="screen" id="s-hh">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-bottom:20px">
+    <div class="logo" style="margin-bottom:0">Household</div>
+    <span class="badge b-blue" id="hh-grp-badge"></span>
+  </div>
+  <div id="hh-exp">
+    <div class="card card-gold">
+      <h3>Round <span id="hh-rnd-num"></span> - submit expectation</h3>
+      <p style="font-size:13px;color:#70708a;margin-bottom:12px;line-height:1.6">What inflation do you expect?<br>Payoff = 10 - |your guess - actual pi|</p>
+      <input type="number" id="hh-exp-in" placeholder="e.g. 2.5" step="0.1">
+      <button class="btn btn-gold" id="hh-sub-btn" onclick="hhSubmit()">Submit Expectation</button>
+    </div>
+    <div class="card" style="background:#07090f"><div class="stat-row"><span class="sl">Payoff formula</span><span class="sv" style="font-size:12px">10 - |exp - actual pi|</span></div></div>
+    <div class="card" id="hh-hist-exp-card" style="display:none"><div class="hist-title">Round history</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Rnd</th><th>My exp</th><th>Actual pi</th><th>Payoff</th><th>Cumul.</th></tr></thead><tbody id="hh-hist-exp"></tbody></table></div></div>
+  </div>
+  <div id="hh-wait" style="display:none">
+    <div class="waiting"><div class="spinner"></div><div class="wt">Expectation submitted.<br>Waiting for central banker...</div><div class="ws" id="hh-sub-echo"></div></div>
+    <div class="card" id="hh-hist-wait-card" style="display:none"><div class="hist-title">Round history</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Rnd</th><th>My exp</th><th>Actual pi</th><th>Payoff</th><th>Cumul.</th></tr></thead><tbody id="hh-hist-wait"></tbody></table></div></div>
+  </div>
+  <div id="hh-res" style="display:none">
+    <span class="badge b-gold" id="hh-res-badge"></span>
+    <div class="payoff-big" style="margin-top:10px"><div class="payoff-num" id="hh-pay-num">-</div><div class="payoff-lbl">Payoff this round</div></div>
+    <div class="card">
+      <div class="stat-row"><span class="sl">Your expectation</span><span class="sv" id="hh-r-exp">-</span></div>
+      <div class="stat-row"><span class="sl">Shock</span><span class="sv" id="hh-r-shock">-</span></div>
+      <div class="stat-row"><span class="sl">Interest rate</span><span class="sv" id="hh-r-rate">-</span></div>
+      <div class="stat-row"><span class="sl">Output gap</span><span class="sv" id="hh-r-gap">-</span></div>
+      <div class="stat-row"><span class="sl">Actual inflation</span><span class="sv gold" id="hh-r-inf">-</span></div>
+      <div class="stat-row"><span class="sl">CB payoff</span><span class="sv" id="hh-r-cbpay">-</span></div>
+      <div class="stat-row"><span class="sl">Cumulative payoff</span><span class="sv green" id="hh-r-cum">-</span></div>
+    </div>
+    <div class="card"><div class="hist-title">Round history</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Rnd</th><th>My exp</th><th>Actual pi</th><th>Payoff</th><th>Cumul.</th></tr></thead><tbody id="hh-hist"></tbody></table></div></div>
+    <div class="waiting"><div class="wt">Waiting for next round...</div></div>
+  </div>
+</div>
+
+<div class="screen" id="s-spectator">
+  <div class="logo" style="padding-top:10px">Spectator - <span id="spec-code"></span></div>
+  <div class="card"><h3>Live state</h3><div id="spec-live"></div></div>
+  <div class="card"><h3>Leaderboard</h3><div id="spec-lb"></div></div>
+  <div class="card"><h3>History</h3><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Rnd</th><th>Grp</th><th>AvgExp</th><th>Shock</th><th>Rate</th><th>Pi</th><th>Gap</th><th>CB+</th></tr></thead><tbody id="spec-hist"></tbody></table></div></div>
+</div>
+
+<div class="toast-bar" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyA37x8pFN6hSIi7Xsjvl2CiRd8fyGeCLbU",authDomain:"macroclass-eb7b3.firebaseapp.com",databaseURL:"https://macroclass-eb7b3-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"macroclass-eb7b3",storageBucket:"macroclass-eb7b3.firebasestorage.app",messagingSenderId:"73124980549",appId:"1:73124980549:web:e37cfbe7a30378c0f1002c"});
+const db=firebase.database();
+let myRole=null,myGroup=null,myCode=null,myId=Math.random().toString(36).slice(2,9),myName='';
+let gameRef=null,localGame=null,unsubFn=null,joinRole=null,mcActiveTab='ctrl';
+let hhMyExp=null,hhMyRound=null,hhCum=0,hhHist=[];
+let cbSubmitted=false,cbMyRound=null,cbCum=0,cbHist=[];
+const $=id=>document.getElementById(id);
+function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('s-'+n).classList.add('active');}
+function toast(msg,ms=2800){const t=$('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',ms);}
+function setErr(id,msg){const e=$(id);e.textContent=msg;e.style.display=msg?'block':'none';}
+function clr(v,hi=15,lo=8){return v>=hi?'#5abf8a':v>=lo?'#c8a84b':'#d86a6a';}
+function f2(v){return(+v).toFixed(2);}function f1(v){return(+v).toFixed(1);}
+function parseRoster(txt){
+  const map={};if(!txt||!txt.trim())return map;
+  txt.trim().split('\n').forEach(line=>{
+    const p=line.split(',').map(s=>s.trim());if(p.length<3)return;
+    const[name,grp,role]=p;const g=parseInt(grp);if(!g||!name||!role)return;
+    const r=role.toLowerCase();if(r!=='cb'&&r!=='hh')return;
+    map[Math.random().toString(36).slice(2,6).toUpperCase()]={name,group:g,role:r};
+  });return map;
+}
+function onCodeInput(){
+  const val=$('jn-code').value.trim().toUpperCase();const parts=val.split('-');
+  if(parts.length===2&&parts[0].length===4&&parts[1].length>=2){
+    $('jn-auto-card').style.display='block';$('jn-manual').style.display='none';
+    $('jn-auto-msg').textContent='Personal code detected - role will be auto-assigned';
+  } else {$('jn-auto-card').style.display='none';$('jn-manual').style.display=val.length===4?'block':'none';}
+}
+function selRole(role,el){
+  joinRole=role;document.querySelectorAll('.rc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
+  $('jn-grp-row').style.display=(role==='cb'||role==='hh')?'block':'none';
+  $('jn-name-row').style.display=role==='hh'?'block':'none';
+}
+async function createGame(){
+  const numGroups=parseInt($('cr-ng').value);const numRounds=parseInt($('cr-nr').value);
+  const roster=parseRoster($('cr-roster').value);
+  const code=Math.random().toString(36).slice(2,6).toUpperCase();
+  const state={code,round:1,phase:'expectation',baseRate:2,shock:null,numGroups,numRounds,groups:{},history:[],avgExpHistory:{},roster,gameOver:false,createdAt:Date.now()};
+  try{
+    await db.ref('games/'+code).set(state);
+    myCode=code;myRole='master';gameRef=db.ref('games/'+code);
+    $('mc-code-badge').textContent='Code: '+code;showScreen('master');subscribe(renderMaster);toast('Game created! Room code: '+code);
+  }catch(e){setErr('cr-err','Failed: '+e.message);}
+}
+async function joinGame(){
+  const raw=$('jn-code').value.trim().toUpperCase();setErr('jn-err','');
+  if(!raw){setErr('jn-err','Enter a code.');return;}
+  const parts=raw.split('-');const roomCode=parts[0];const personalSuffix=parts[1]||null;
+  const snap=await db.ref('games/'+roomCode).get();
+  if(!snap.exists()){setErr('jn-err','Game not found. Check the code.');return;}
+  const g=snap.val();localGame=g;
+  if(personalSuffix){
+    const entry=g.roster&&g.roster[personalSuffix];
+    if(!entry){setErr('jn-err','Personal code not found.');return;}
+    myRole=entry.role;myGroup=entry.group;myName=entry.name;
+  } else {
+    if(!joinRole){setErr('jn-err','Select your role.');return;}
+    if((joinRole==='cb'||joinRole==='hh')&&!$('jn-group').value){setErr('jn-err','Enter your group number.');return;}
+    myRole=joinRole;myGroup=parseInt($('jn-group').value)||null;myName=$('jn-name')?.value?.trim()||myId;
+  }
+  myCode=roomCode;gameRef=db.ref('games/'+roomCode);
+  if(myRole==='cb'){$('cb-grp-badge').textContent='Group '+myGroup;showScreen('cb');subscribe(renderCB);}
+  else if(myRole==='hh'){$('hh-grp-badge').textContent='Group '+myGroup;showScreen('hh');subscribe(renderHH);}
+  else{$('spec-code').textContent=roomCode;showScreen('spectator');subscribe(renderSpectator);}
+}
+function subscribe(fn){if(unsubFn)unsubFn();const h=snap=>{if(!snap.exists())return;localGame=snap.val();fn(localGame);};gameRef.on('value',h);unsubFn=()=>gameRef.off('value',h);}
+const phTxt=[['Phase 1: Awaiting household expectations','Households are submitting their inflation expectations.'],['Phase 2: Set the shock','Enter the demand/supply shock value for this round.'],['Phase 3: Central bankers deciding','Groups are reviewing expectations and setting their rate.'],['Phase 4: Results revealed','All groups can see the final outcomes for this round.']];
+function mcTab(tab,el){mcActiveTab=tab;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');['ctrl','codes','groups','board','data'].forEach(t=>$('mc-'+t).style.display=t===tab?'block':'none');if(localGame)renderMaster(localGame);}
+function renderMaster(g){
+  if(!g)return;const ph=['expectation','shock','cb_decision','results'];const pi=ph.indexOf(g.phase);
+  $('mc-rnd-badge').textContent='Round '+g.round+'/'+g.numRounds;
+  $('mc-pips').querySelectorAll('.pip').forEach((p,i)=>{p.className='pip'+(i<pi?' done':i===pi?' active':'');});
+  if(pi>=0){$('mc-ph-label').textContent=phTxt[pi][0];$('mc-ph-desc').textContent=phTxt[pi][1];}
+  $('mc-p1').style.display=g.phase==='expectation'&&!g.gameOver?'block':'none';
+  $('mc-p2').style.display=g.phase==='shock'?'block':'none';
+  $('mc-p3').style.display=g.phase==='cb_decision'?'block':'none';
+  $('mc-p4').style.display=g.phase==='results'&&!g.gameOver?'block':'none';
+  $('mc-over').style.display=g.gameOver?'block':'none';
+  if(g.phase==='expectation'){let s='';for(let gr=1;gr<=g.numGroups;gr++){const n=Object.values((g.groups&&g.groups[gr]&&g.groups[gr].households)||{}).length;s+='<span style="font-size:12px;color:'+(n>0?'#5abf8a':'#6b6254')+';margin-right:10px">Grp '+gr+': '+n+'/6</span>';}$('mc-hh-prog').innerHTML=s||'No submissions yet.';}
+  if(g.phase==='cb_decision'){let done=0,tot=0;for(let gr=1;gr<=g.numGroups;gr++){const grp=g.groups&&g.groups[gr];if(!grp)continue;tot++;if(grp.cbDecision!==null&&grp.cbDecision!==undefined)done++;}$('mc-cb-prog').textContent=done+' / '+tot+' groups finalised';$('mc-reveal-btn').style.display=(tot>0&&done===tot)?'block':'none';}
+  if(g.phase==='results'){let html='';for(let gr=1;gr<=g.numGroups;gr++){const grp=g.groups&&g.groups[gr];if(!grp||!grp.result)continue;const r=grp.result;html+='<div class="stat-row"><span class="sl">Group '+gr+'</span><span class="sv" style="font-size:12px">AvgExp='+f2(r.avgExp)+' Pi='+f2(r.inflation)+' Gap='+f2(r.gap)+' Pay='+f1(r.cbPayoff)+'</span></div>';}$('mc-res-body').innerHTML=html||'No results.';$('mc-next-btn').style.display=g.round<g.numRounds?'block':'none';}
+  if(mcActiveTab==='codes')renderCodes(g);if(mcActiveTab==='groups')renderGroups(g);if(mcActiveTab==='board')renderBoard(g);if(mcActiveTab==='data')renderData(g);
+}
+function renderCodes(g){
+  $('mc-main-code').textContent=g.code;const roster=g.roster||{};let html='';
+  if(Object.keys(roster).length===0){for(let gr=1;gr<=g.numGroups;gr++){html+='<div class="code-item"><div class="code-val">'+g.code+'-CB'+gr+'</div><div class="code-lbl">Group '+gr+' CB</div></div>';html+='<div class="code-item"><div class="code-val">'+g.code+'-HH'+gr+'</div><div class="code-lbl">Group '+gr+' HH</div></div>';}}
+  else{Object.entries(roster).forEach(([suf,info])=>{html+='<div class="code-item"><div class="code-val">'+g.code+'-'+suf+'</div><div class="code-lbl">'+info.name+' Grp '+info.group+' '+info.role.toUpperCase()+'</div></div>';});}
+  $('mc-code-grid').innerHTML=html;
+}
+function copyAllCodes(){
+  const g=localGame;if(!g)return;const roster=g.roster||{};let txt='Room code: '+g.code+'\n\n';
+  if(Object.keys(roster).length===0){for(let gr=1;gr<=g.numGroups;gr++){txt+='Group '+gr+' CB: '+g.code+'-CB'+gr+'\nGroup '+gr+' HH: '+g.code+'-HH'+gr+'\n';}}
+  else{Object.entries(roster).forEach(([suf,info])=>{txt+=info.name+' (Grp '+info.group+' '+info.role.toUpperCase()+'): '+g.code+'-'+suf+'\n';});}
+  navigator.clipboard.writeText(txt).then(()=>toast('Codes copied!')).catch(()=>toast('Copy failed'));
+}
+function renderGroups(g){
+  let html='',count=0;
+  for(let gr=1;gr<=g.numGroups;gr++){const grp=(g.groups&&g.groups[gr])||{};const hhs=Object.values(grp.households||{}).length;const cbOk=grp.cbDecision!==null&&grp.cbDecision!==undefined;count++;html+='<div class="grp-status"><span style="color:#c0b8a8">Group '+gr+'</span><div style="display:flex;gap:5px"><span class="badge '+(hhs>0?'b-green':'b-gray')+'">'+hhs+'/6 HH</span><span class="badge '+(cbOk?'b-green':'b-gray')+'">'+(cbOk?'CB v':'CB -')+'</span></div></div>';}
+  $('mc-grp-count').textContent=count;$('mc-groups-body').innerHTML=html;
+}
+function renderBoard(g){
+  const scores={};(g.history||[]).forEach(h=>{scores[h.group]=(scores[h.group]||0)+h.cbPayoff;});
+  const ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  $('mc-lb-cb').innerHTML=ranked.length?ranked.map(([gr,sc],i)=>'<div class="lb-row"><div class="lb-rank '+(i<3?'top':'')+'">'+((i+1))+'</div><div class="lb-name">Group '+gr+'</div><div class="lb-score">'+f1(sc)+'</div></div>').join(''):'<div style="font-size:13px;color:#3a3830;padding:12px 0;text-align:center">No rounds yet</div>';
+  const expH=g.avgExpHistory||{};let rA='',rB='';
+  for(let r=1;r<=g.round;r++){const rd=expH[r]||{};const fv=v=>rd[v]!==undefined?f2(rd[v]):'--';rA+='<tr><td>'+r+'</td><td>'+fv(1)+'</td><td>'+fv(2)+'</td><td>'+fv(3)+'</td><td>'+fv(4)+'</td><td>'+fv(5)+'</td></tr>';rB+='<tr><td>'+r+'</td><td>'+fv(6)+'</td><td>'+fv(7)+'</td><td>'+fv(8)+'</td><td>'+fv(9)+'</td><td>'+fv(10)+'</td></tr>';}
+  $('mc-exp-a').innerHTML=rA||'<tr><td colspan="6" style="color:#3a3830;padding:10px 0;text-align:center">No data</td></tr>';
+  $('mc-exp-b').innerHTML=rB||'<tr><td colspan="6" style="color:#3a3830;padding:10px 0;text-align:center">No data</td></tr>';
+}
+function renderData(g){
+  const tbody=$('mc-data-body');tbody.innerHTML='';
+  (g.history||[]).forEach(h=>{const tr=document.createElement('tr');tr.innerHTML='<td>'+h.round+'</td><td>'+h.group+'</td><td>'+f2(h.avgExp)+'</td><td>'+f2(h.shock||0)+'</td><td>'+f2(h.rate||0)+'</td><td>'+f2(h.inflation||0)+'</td><td>'+f2(h.gap||0)+'</td><td>'+f1(h.cbPayoff||0)+'</td>';tbody.appendChild(tr);});
+  if(!(g.history||[]).length)tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#2a2820;padding:14px">No data yet</td></tr>';
+}
+async function mcAdvance(){await gameRef.update({phase:'shock'});}
+async function mcReleaseShock(){
+  const shock=parseFloat($('mc-shock-in').value);if(isNaN(shock)){toast('Enter a shock value first');return;}
+  const g=localGame;const updates={phase:'cb_decision',shock};
+  for(let gr=1;gr<=g.numGroups;gr++){updates['groups/'+gr+'/cbDecision']=null;updates['groups/'+gr+'/result']=null;if(!g.groups||!g.groups[gr]||g.groups[gr].interestRate===undefined)updates['groups/'+gr+'/interestRate']=g.baseRate;}
+  await gameRef.update(updates);toast('Shock released!');
+}
+async function mcReveal(){
+  const g=localGame;const updates={};const histEntries=[];
+  const newAvgExp=JSON.parse(JSON.stringify(g.avgExpHistory||{}));newAvgExp[g.round]={};
+  for(let gr=1;gr<=g.numGroups;gr++){
+    const grp=g.groups&&g.groups[gr];if(!grp||grp.cbDecision===null||grp.cbDecision===undefined)continue;
+    const hhs=Object.values(grp.households||{});const avgExp=hhs.length>0?hhs.reduce((a,b)=>a+b,0)/hhs.length:2;
+    newAvgExp[g.round][gr]=+avgExp.toFixed(4);
+    const prevRate=grp.interestRate!==undefined?grp.interestRate:g.baseRate;
+    const newRate=prevRate+grp.cbDecision;const gap=2+g.shock-newRate;const inflation=avgExp+0.25*gap;const cbPayoff=20-Math.pow(inflation-2,2);
+    const result={inflation:+inflation.toFixed(4),gap:+gap.toFixed(4),rate:+newRate.toFixed(4),cbPayoff:+cbPayoff.toFixed(4),shock:g.shock,avgExp:+avgExp.toFixed(4)};
+    updates['groups/'+gr+'/result']=result;updates['groups/'+gr+'/interestRate']=newRate;
+    histEntries.push({round:g.round,group:gr,inflation:result.inflation,gap:result.gap,rate:result.rate,cbPayoff:result.cbPayoff,shock:result.shock,avgExp:result.avgExp,hhCount:hhs.length});
+  }
+  updates.phase='results';updates.history=[...(g.history||[]),...histEntries];updates.avgExpHistory=newAvgExp;
+  await gameRef.update(updates);toast('Results revealed!');
+}
+async function mcNext(){
+  const g=localGame;const updates={round:g.round+1,phase:'expectation',shock:null};
+  for(let gr=1;gr<=g.numGroups;gr++){updates['groups/'+gr+'/households']={};updates['groups/'+gr+'/cbDecision']=null;updates['groups/'+gr+'/result']=null;}
+  await gameRef.update(updates);toast('Round '+(g.round+1)+' started!');
+}
+async function mcEnd(){await gameRef.update({gameOver:true});}
+async function mcReset(){
+  if(!confirm('Reset game? All data cleared.'))return;const g=localGame;
+  await gameRef.set({code:g.code,round:1,phase:'expectation',baseRate:2,shock:null,numGroups:g.numGroups,numRounds:g.numRounds,groups:{},history:[],avgExpHistory:{},roster:g.roster||{},gameOver:false,createdAt:Date.now()});
+  toast('Game reset!');
+}
+function doExcel(){
+  const g=localGame;if(!g){toast('No data');return;}const wb=XLSX.utils.book_new();
+  const hist=(g.history||[]).map(h=>({'Round':h.round,'Group':h.group,'Avg Exp':+f2(h.avgExp),'Shock':+f2(h.shock||0),'Interest Rate':+f2(h.rate||0),'Inflation':+f2(h.inflation||0),'Output Gap':+f2(h.gap||0),'CB Payoff':+f1(h.cbPayoff||0),'HH Count':h.hhCount||0}));
+  const ws1=XLSX.utils.json_to_sheet(hist);XLSX.utils.book_append_sheet(wb,ws1,'Round History');
+  const expH=g.avgExpHistory||{};const expRows=[];
+  for(let r=1;r<=g.round;r++){const row={Round:r};for(let gr=1;gr<=g.numGroups;gr++){row['Group '+gr]=(expH[r]&&expH[r][gr]!==undefined)?+f2(expH[r][gr]):'';}expRows.push(row);}
+  const ws2=XLSX.utils.json_to_sheet(expRows);XLSX.utils.book_append_sheet(wb,ws2,'Avg Expectations');
+  const scores={};(g.history||[]).forEach(h=>{scores[h.group]=(scores[h.group]||0)+h.cbPayoff;});
+  const lb=Object.entries(scores).sort((a,b)=>b[1]-a[1]).map(([gr,sc],i)=>({Rank:i+1,Group:+gr,'Cumulative CB Payoff':+f1(sc)}));
+  const ws3=XLSX.utils.json_to_sheet(lb);XLSX.utils.book_append_sheet(wb,ws3,'Leaderboard');
+  const roster=g.roster||{};const rosterRows=Object.entries(roster).map(([suf,info])=>({Name:info.name,Group:info.group,Role:info.role,'Personal Code':g.code+'-'+suf}));
+  if(rosterRows.length){const ws4=XLSX.utils.json_to_sheet(rosterRows);XLSX.utils.book_append_sheet(wb,ws4,'Roster');}
+  XLSX.writeFile(wb,'macro_game_'+g.code+'.xlsx');toast('Excel downloaded!');
+}
+function renderCB(g){
+  if(!g)return;const grp=(g.groups&&g.groups[myGroup])||{};const curRate=grp.interestRate!==undefined?grp.interestRate:g.baseRate;
+  if(cbMyRound!==g.round){cbMyRound=g.round;cbSubmitted=false;$('cb-delta-in').value='';$('cb-prev').style.display='none';$('cb-fin-btn').disabled=true;}
+  if(g.gameOver){show3cb('wait');$('cb-wait-msg').textContent='Game over!';return;}
+  if(g.phase==='expectation'){show3cb('wait');const n=Object.values(grp.households||{}).length;$('cb-wait-msg').textContent='Waiting for households to submit expectations...';$('cb-wait-sub').textContent=n>0?n+'/6 submitted':'';return;}
+  if((g.phase==='shock'||g.phase==='cb_decision')&&!cbSubmitted){
+    show3cb('decide');const hhs=Object.values(grp.households||{});const avg=hhs.length>0?hhs.reduce((a,b)=>a+b,0)/hhs.length:2;
+    $('cb-rnd-num').textContent=g.round;$('cb-avg-exp').textContent=f2(avg)+'%';$('cb-shock-val').textContent=g.shock!==null&&g.shock!==undefined?f2(g.shock):'(waiting...)';$('cb-cur-rate').textContent=f2(curRate)+'%';$('cb-fin-btn').disabled=g.shock===null||g.shock===undefined;
+    renderCBHist('cb-hist-decide');$('cb-hist-decide-card').style.display=cbHist.length?'block':'none';return;
+  }
+  if(cbSubmitted&&g.phase!=='results'){show3cb('wait');$('cb-wait-msg').textContent='Decision submitted. Waiting for master...';$('cb-wait-sub').textContent='';return;}
+  if(g.phase==='results'&&grp.result){
+    show3cb('res');const r=grp.result;
+    if(!cbHist.find(h=>h.round===g.round)){cbHist.push({round:g.round,shock:r.shock,rate:r.rate,inflation:r.inflation,gap:r.gap,payoff:r.cbPayoff});cbCum+=r.cbPayoff;}
+    $('cb-res-badge').textContent='Round '+g.round+' complete';$('cb-r-rate').textContent=f2(r.rate)+'%';$('cb-r-gap').textContent=f2(r.gap);$('cb-r-inf').textContent=f2(r.inflation)+'%';$('cb-r-cum').textContent=f1(cbCum);
+    const pn=$('cb-pay-num');pn.textContent=f1(r.cbPayoff);pn.style.color=clr(r.cbPayoff);renderCBHist('cb-hist');
+  }
+}
+function show3cb(w){['wait','decide','res'].forEach(k=>$('cb-'+k).style.display=k===w?'block':'none');}
+function renderCBHist(tid){const tbody=$(tid);if(!tbody)return;tbody.innerHTML='';let cum=0;cbHist.forEach(h=>{cum+=h.payoff;const tr=document.createElement('tr');tr.innerHTML='<td>'+h.round+'</td><td>'+f2(h.shock)+'</td><td>'+f2(h.rate)+'</td><td>'+f2(h.inflation)+'</td><td>'+f2(h.gap)+'</td><td>'+f1(h.payoff)+'</td><td>'+f1(cum)+'</td>';tbody.appendChild(tr);});}
+function cbPreview(){
+  const delta=parseFloat($('cb-delta-in').value);
+  if(isNaN(delta)||!localGame||localGame.shock===null||localGame.shock===undefined){$('cb-prev').style.display='none';$('cb-fin-btn').disabled=true;return;}
+  const g=localGame,grp=(g.groups&&g.groups[myGroup])||{};const cur=grp.interestRate!==undefined?grp.interestRate:g.baseRate;
+  const hhs=Object.values(grp.households||{});const avg=hhs.length>0?hhs.reduce((a,b)=>a+b,0)/hhs.length:2;
+  const newRate=cur+delta,gap=2+g.shock-newRate,inf=avg+0.25*gap,pay=20-Math.pow(inf-2,2);
+  $('cb-prev').style.display='block';$('pv-rate').textContent=f2(newRate)+'%';$('pv-gap').textContent=f2(gap);$('pv-inf').textContent=f2(inf)+'%';$('pv-pay').textContent=f2(pay);$('pv-pay').style.color=clr(pay);$('cb-fin-btn').disabled=false;
+}
+async function cbFinalise(){
+  const delta=parseFloat($('cb-delta-in').value);if(isNaN(delta)){toast('Enter a valid change');return;}
+  await gameRef.child('groups/'+myGroup+'/cbDecision').set(delta);
+  cbSubmitted=true;toast('Decision finalised!');show3cb('wait');$('cb-wait-msg').textContent='Decision submitted. Waiting for master to reveal...';$('cb-wait-sub').textContent='';
+}
+function renderHH(g){
+  if(!g)return;if(hhMyRound!==g.round){hhMyRound=g.round;hhMyExp=null;$('hh-exp-in').value='';$('hh-sub-btn').disabled=false;}
+  if(g.gameOver){show3hh('wait');return;}
+  if(g.phase==='expectation'&&hhMyExp===null){show3hh('exp');$('hh-rnd-num').textContent=g.round;renderHHHist('hh-hist-exp');$('hh-hist-exp-card').style.display=hhHist.length?'block':'none';return;}
+  if(g.phase==='expectation'||g.phase==='shock'||g.phase==='cb_decision'){show3hh('wait');$('hh-sub-echo').textContent=hhMyExp!==null?'Your expectation: '+f2(hhMyExp)+'%':'';renderHHHist('hh-hist-wait');$('hh-hist-wait-card').style.display=hhHist.length?'block':'none';return;}
+  if(g.phase==='results'){
+    const grp=g.groups&&g.groups[myGroup];if(!grp||!grp.result)return;show3hh('res');const r=grp.result;
+    const myPay=hhMyExp!==null?Math.max(0,10-Math.abs(hhMyExp-r.inflation)):0;
+    if(!hhHist.find(h=>h.round===g.round)&&hhMyExp!==null){hhHist.push({round:g.round,myExp:hhMyExp,inflation:r.inflation,payoff:myPay});hhCum+=myPay;}
+    $('hh-res-badge').textContent='Round '+g.round+' complete';$('hh-r-exp').textContent=hhMyExp!==null?f2(hhMyExp)+'%':'-';$('hh-r-shock').textContent=f2(r.shock);$('hh-r-rate').textContent=f2(r.rate)+'%';$('hh-r-gap').textContent=f2(r.gap);$('hh-r-inf').textContent=f2(r.inflation)+'%';$('hh-r-cbpay').textContent=f1(r.cbPayoff);$('hh-r-cum').textContent=f1(hhCum);
+    const pn=$('hh-pay-num');pn.textContent=f2(myPay);pn.style.color=clr(myPay,8,4);renderHHHist('hh-hist');
+  }
+}
+function show3hh(w){['exp','wait','res'].forEach(k=>$('hh-'+k).style.display=k===w?'block':'none');}
+function renderHHHist(tid){const tbody=$(tid);if(!tbody)return;tbody.innerHTML='';let cum=0;hhHist.forEach(h=>{cum+=h.payoff;const tr=document.createElement('tr');tr.innerHTML='<td>'+h.round+'</td><td>'+f2(h.myExp)+'</td><td>'+f2(h.inflation)+'</td><td>'+f2(h.payoff)+'</td><td>'+f2(cum)+'</td>';tbody.appendChild(tr);});}
+async function hhSubmit(){
+  const val=parseFloat($('hh-exp-in').value);if(isNaN(val)){toast('Enter a valid number');return;}
+  if(localGame.phase!=='expectation'){toast('Expectation phase is over');return;}
+  await gameRef.child('groups/'+myGroup+'/households/'+myId).set(val);
+  hhMyExp=val;$('hh-sub-btn').disabled=true;toast('Submitted!');show3hh('wait');$('hh-sub-echo').textContent='Your expectation: '+f2(val)+'%';renderHHHist('hh-hist-wait');$('hh-hist-wait-card').style.display=hhHist.length?'block':'none';
+}
+function renderSpectator(g){
+  if(!g)return;
+  $('spec-live').innerHTML='<div class="stat-row"><span class="sl">Round</span><span class="sv gold">'+g.round+' / '+g.numRounds+'</span></div><div class="stat-row"><span class="sl">Phase</span><span class="sv">'+g.phase.replace('_',' ')+'</span></div><div class="stat-row"><span class="sl">Shock</span><span class="sv">'+(g.shock!==null&&g.shock!==undefined?f2(g.shock):'-')+'</span></div>';
+  const scores={};(g.history||[]).forEach(h=>{scores[h.group]=(scores[h.group]||0)+h.cbPayoff;});
+  const ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  $('spec-lb').innerHTML=ranked.length?ranked.map(([gr,sc],i)=>'<div class="lb-row"><div class="lb-rank '+(i<3?'top':'')+'">'+((i+1))+'</div><div class="lb-name">Group '+gr+'</div><div class="lb-score">'+f1(sc)+'</div></div>').join(''):'<div style="font-size:13px;color:#3a3830;padding:10px 0">No rounds yet</div>';
+  const tbody=$('spec-hist');tbody.innerHTML='';
+  (g.history||[]).forEach(h=>{const tr=document.createElement('tr');tr.innerHTML='<td>'+h.round+'</td><td>'+h.group+'</td><td>'+f2(h.avgExp)+'</td><td>'+f2(h.shock||0)+'</td><td>'+f2(h.rate||0)+'</td><td>'+f2(h.inflation||0)+'</td><td>'+f2(h.gap||0)+'</td><td>'+f1(h.cbPayoff||0)+'</td>';tbody.appendChild(tr);});
+}
+</script>
+</body>
+</html>
