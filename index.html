@@ -110,12 +110,12 @@ textarea{resize:vertical;min-height:80px;font-size:13px}
   <div class="logo">Join Game</div><h1>Join</h1>
   <div class="card">
     <h3>Enter your code</h3>
-    <p style="font-size:12px;color:#5a5458;margin-bottom:10px">Room code (4 letters) or personal code from instructor.</p>
-    <input type="text" id="jn-code" placeholder="e.g. K7BQ or K7BQ-AB12" maxlength="12"
+    <p style="font-size:12px;color:#5a5458;margin-bottom:10px">Enter the <span style="color:#c8a84b">room code</span> (4 letters) to join manually, or your <span style="color:#c8a84b">MSC student code</span> for auto-assignment.</p>
+    <input type="text" id="jn-code" placeholder="Room code or MSC-XXXX" maxlength="12"
       style="font-size:20px;letter-spacing:.15em;text-align:center;text-transform:uppercase"
       oninput="this.value=this.value.toUpperCase();onCodeInput()">
   </div>
-  <div id="jn-auto-card" style="display:none"><div class="card" style="background:#0a1420;border-color:#1a3040"><div id="jn-auto-msg" style="font-size:14px;color:#6a9fd8;text-align:center;padding:4px 0"></div></div></div>
+  <div id="jn-auto-card" style="display:none"><div class="card" style="background:#0a1420;border-color:#1a3040"><div id="jn-auto-msg" style="font-size:14px;color:#6a9fd8;text-align:center;padding:8px 0;margin-bottom:10px"></div><h3>Room code (from instructor)</h3><input type="text" id="jn-room-code" placeholder="e.g. K7BQ" maxlength="4" style="font-size:20px;letter-spacing:.15em;text-align:center;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div></div>
   <div id="jn-manual" style="display:none">
     <div class="card">
       <h3>Your role</h3>
@@ -297,12 +297,21 @@ function parseRoster(txt){
     map[Math.random().toString(36).slice(2,6).toUpperCase()]={name,group:g,role:r};
   });return map;
 }
+
+const STUDENT_DB={"MSC-5803":{"name":"PRIYAM PRIYADARSHI","group":1,"role":"hh"},"MSC-4811":{"name":"BHAWNA CHETIWAL","group":1,"role":"hh"},"MSC-6925":{"name":"RAJ SHAW","group":1,"role":"cb"},"MSC-5557":{"name":"SANTOSH KUMAR","group":1,"role":"hh"},"MSC-6514":{"name":"SAUBHIK BISWAS","group":1,"role":"hh"},"MSC-2654":{"name":"ASHISH","group":1,"role":"hh"},"MSC-8428":{"name":"ADARSH KUMAR","group":1,"role":"hh"},"MSC-4814":{"name":"SUDHANSHU PANDEY","group":1,"role":"hh"},"MSC-9279":{"name":"VANSH SINGLA","group":1,"role":"hh"},"MSC-2535":{"name":"TRISHA BALA","group":2,"role":"cb"},"MSC-1488":{"name":"JIGYASA RANGARE","group":2,"role":"hh"},"MSC-6635":{"name":"RITOBHASH DAW","group":2,"role":"hh"},"MSC-1750":{"name":"MEET KUMAR K CHAUHAN","group":2,"role":"hh"},"MSC-2584":{"name":"PRIYANSHU SINGH","group":2,"role":"hh"},"MSC-4733":{"name":"AMRITANSH ARYAN","group":2,"role":"hh"},"MSC-5374":{"name":"UMANG SHARMA","group":2,"role":"hh"},"MSC-6977":{"name":"DILKHUSH KUMAR","group":2,"role":"hh"},"MSC-3677":{"name":"HAQ NAWAZ NIZAMI","group":2,"role":"hh"},"MSC-4582":{"name":"SAINDHAVI DAS","group":3,"role":"hh"},"MSC-4432":{"name":"PRERANA SUTRADHAR","group":3,"role":"hh"},"MSC-4527":{"name":"RINKESH MALLIK","group":3,"role":"hh"},"MSC-8359":{"name":"MD IZHAR ALAM","group":3,"role":"hh"},"MSC-9751":{"name":"OM PATHAK","group":3,"role":"hh"},"MSC-5506":{"name":"SUPARNO SEN","group":3,"role":"cb"},"MSC-7873":{"name":"MOHAMMAD SARIM ANSARI","group":3,"role":"hh"},"MSC-4257":{"name":"AMISH PRASAD","group":3,"role":"hh"},"MSC-1106":{"name":"PIYUSH AGARWAL","group":3,"role":"hh"},"MSC-7912":{"name":"SAMRIDDHI","group":4,"role":"cb"},"MSC-1711":{"name":"CHETNA RAKESH JAIN","group":4,"role":"hh"},"MSC-2679":{"name":"ADITYA SATISH TAUR","group":4,"role":"hh"},"MSC-7227":{"name":"SOUMALLO BHADRA","group":4,"role":"hh"},"MSC-6820":{"name":"KAUSHIK SRIVASTAVA","group":4,"role":"hh"},"MSC-4657":{"name":"VISHAL KUMAR","group":4,"role":"hh"},"MSC-7201":{"name":"UJJWAL TIWARI","group":4,"role":"hh"},"MSC-2169":{"name":"ANISH SINGH","group":4,"role":"hh"},"MSC-4611":{"name":"MADHU SUDAN YADAV","group":4,"role":"hh"},"MSC-5012":{"name":"VEDIKA PATHAK","group":5,"role":"hh"},"MSC-3286":{"name":"PASHMEEN KAUR KALRA","group":5,"role":"hh"},"MSC-5741":{"name":"JAYSURYA S","group":5,"role":"hh"},"MSC-5552":{"name":"IMMANUEL JIJO","group":5,"role":"hh"},"MSC-1520":{"name":"SAURABH KUMAR","group":5,"role":"hh"},"MSC-5333":{"name":"SOURABH GAUTAM","group":5,"role":"hh"},"MSC-1409":{"name":"ARMAAN RANDHAWA","group":5,"role":"hh"},"MSC-2307":{"name":"PRANAV MANOJ NAIR","group":5,"role":"cb"},"MSC-3547":{"name":"ASHUTOSH PANDEY","group":5,"role":"hh"},"MSC-8527":{"name":"ISHANI MITRA","group":6,"role":"hh"},"MSC-5010":{"name":"YASH NANDAN","group":6,"role":"hh"},"MSC-2674":{"name":"MAKHREO ENOCH CHALAI","group":6,"role":"hh"},"MSC-5554":{"name":"ATHARVA DHAUNDIYAL","group":6,"role":"cb"},"MSC-9928":{"name":"HIMANSHU YADAV","group":6,"role":"hh"},"MSC-7924":{"name":"SAMPAD BANERJEE","group":6,"role":"hh"},"MSC-2139":{"name":"PROTIM GOGOI","group":6,"role":"hh"},"MSC-3615":{"name":"YASH TAYAL","group":6,"role":"hh"},"MSC-2424":{"name":"PAVITHRA M","group":7,"role":"hh"},"MSC-3664":{"name":"AMIT KUMAR","group":7,"role":"hh"},"MSC-4150":{"name":"NAMAN GUPTA","group":7,"role":"hh"},"MSC-7224":{"name":"ABHISHEK KUMAR","group":7,"role":"hh"},"MSC-9935":{"name":"AAKARSH JAIN","group":7,"role":"hh"},"MSC-2824":{"name":"PARTHIB SAHA","group":7,"role":"hh"},"MSC-9785":{"name":"ARYAN ANILKUMAR AKEN","group":7,"role":"hh"},"MSC-3803":{"name":"SAURABH YADAV","group":7,"role":"cb"},"MSC-3045":{"name":"PRIYANKA VERMA","group":8,"role":"hh"},"MSC-6881":{"name":"SOUMYADEEP SAHA","group":8,"role":"hh"},"MSC-7065":{"name":"SONAL KUMAR","group":8,"role":"hh"},"MSC-1434":{"name":"ANURAG JAIN","group":8,"role":"hh"},"MSC-2519":{"name":"AVINASH KUMAR","group":8,"role":"cb"},"MSC-2291":{"name":"SAHIL","group":8,"role":"hh"},"MSC-6574":{"name":"ARPAN BISWAS","group":8,"role":"hh"}};
 function onCodeInput(){
-  const val=$('jn-code').value.trim().toUpperCase();const parts=val.split('-');
-  if(parts.length===2&&parts[0].length===4&&parts[1].length>=2){
+  const val=$('jn-code').value.trim().toUpperCase();
+  if(STUDENT_DB[val]){
     $('jn-auto-card').style.display='block';$('jn-manual').style.display='none';
-    $('jn-auto-msg').textContent='Personal code detected - role will be auto-assigned';
-  } else {$('jn-auto-card').style.display='none';$('jn-manual').style.display=val.length===4?'block':'none';}
+    const s=STUDENT_DB[val];
+    $('jn-auto-msg').textContent='Welcome '+s.name+'! Group '+s.group+' — '+(s.role==='cb'?'Central Banker':'Household');
+  } else {
+    const parts=val.split('-');
+    if(parts.length===2&&parts[0].length===4&&parts[1].length>=2){
+      $('jn-auto-card').style.display='block';$('jn-manual').style.display='none';
+      $('jn-auto-msg').textContent='Personal code detected - role will be auto-assigned';
+    } else {$('jn-auto-card').style.display='none';$('jn-manual').style.display=val.length===4?'block':'none';}
+  }
 }
 function selRole(role,el){
   joinRole=role;document.querySelectorAll('.rc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
@@ -323,6 +332,18 @@ async function createGame(){
 async function joinGame(){
   const raw=$('jn-code').value.trim().toUpperCase();setErr('jn-err','');
   if(!raw){setErr('jn-err','Enter a code.');return;}
+  // Check if it's a student MSC code
+  if(STUDENT_DB[raw]){
+    const roomCode=$('jn-room-code').value.trim().toUpperCase();
+    if(!roomCode||roomCode.length!==4){setErr('jn-err','Also enter the room code from your instructor.');return;}
+    const snap=await db.ref('games/'+roomCode).get();
+    if(!snap.exists()){setErr('jn-err','Room code not found. Check with your instructor.');return;}
+    localGame=snap.val();myCode=roomCode;gameRef=db.ref('games/'+roomCode);
+    const s=STUDENT_DB[raw];myRole=s.role;myGroup=s.group;myName=s.name;
+    if(myRole==='cb'){$('cb-grp-badge').textContent='Group '+myGroup;showScreen('cb');subscribe(renderCB);}
+    else{$('hh-grp-badge').textContent='Group '+myGroup;showScreen('hh');subscribe(renderHH);}
+    return;
+  }
   const parts=raw.split('-');const roomCode=parts[0];const personalSuffix=parts[1]||null;
   const snap=await db.ref('games/'+roomCode).get();
   if(!snap.exists()){setErr('jn-err','Game not found. Check the code.');return;}
