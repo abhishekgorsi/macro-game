@@ -185,6 +185,7 @@ textarea{resize:vertical;min-height:80px;font-size:13px}
     <div class="logo" style="margin-bottom:0">Central Banker</div>
     <span class="badge b-blue" id="cb-grp-badge"></span>
   </div>
+  <div id="cb-mandate-badge" style="margin-bottom:12px;display:none"></div>
   <div id="cb-wait" class="waiting"><div class="spinner"></div><div class="wt" id="cb-wait-msg">Waiting...</div><div class="ws" id="cb-wait-sub"></div></div>
   <div id="cb-decide" style="display:none">
     <div class="card card-gold">
@@ -201,6 +202,8 @@ textarea{resize:vertical;min-height:80px;font-size:13px}
         <div class="stat-row"><span class="sl">New interest rate</span><span class="sv" id="pv-rate">-</span></div>
         <div class="stat-row"><span class="sl">Output gap</span><span class="sv" id="pv-gap">-</span></div>
         <div class="stat-row"><span class="sl">Inflation</span><span class="sv" id="pv-inf">-</span></div>
+        <div class="stat-row" id="pv-infl-pen-row" style="display:none"><span class="sl">Inflation penalty</span><span class="sv" id="pv-infl-pen">-</span></div>
+        <div class="stat-row" id="pv-gap-pen-row" style="display:none"><span class="sl">Gap penalty</span><span class="sv" id="pv-gap-pen">-</span></div>
         <div class="stat-row"><span class="sl">My payoff</span><span class="sv gold" id="pv-pay">-</span></div>
       </div>
       <button class="btn btn-gold" id="cb-fin-btn" disabled onclick="cbFinalise()">Finalise Decision</button>
@@ -217,6 +220,8 @@ textarea{resize:vertical;min-height:80px;font-size:13px}
       <div class="stat-row"><span class="sl">Interest rate</span><span class="sv" id="cb-r-rate">-</span></div>
       <div class="stat-row"><span class="sl">Output gap</span><span class="sv" id="cb-r-gap">-</span></div>
       <div class="stat-row"><span class="sl">Actual inflation</span><span class="sv gold" id="cb-r-inf">-</span></div>
+      <div class="stat-row" id="cb-r-infl-pen-row" style="display:none"><span class="sl">Inflation penalty</span><span class="sv" id="cb-r-infl-pen">-</span></div>
+      <div class="stat-row" id="cb-r-gap-pen-row" style="display:none"><span class="sl">Gap penalty</span><span class="sv" id="cb-r-gap-pen">-</span></div>
       <div class="stat-row"><span class="sl">Cumulative payoff</span><span class="sv green" id="cb-r-cum">-</span></div>
     </div>
     <div class="card">
@@ -278,7 +283,7 @@ textarea{resize:vertical;min-height:80px;font-size:13px}
 <script>
 firebase.initializeApp({apiKey:"AIzaSyA37x8pFN6hSIi7Xsjvl2CiRd8fyGeCLbU",authDomain:"macroclass-eb7b3.firebaseapp.com",databaseURL:"https://macroclass-eb7b3-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"macroclass-eb7b3",storageBucket:"macroclass-eb7b3.firebasestorage.app",messagingSenderId:"73124980549",appId:"1:73124980549:web:e37cfbe7a30378c0f1002c"});
 const db=firebase.database();
-let myRole=null,myGroup=null,myCode=null,myId=Math.random().toString(36).slice(2,9),myName='';
+let myRole=null,myGroup=null,myCode=null,myId=Math.random().toString(36).slice(2,9),myName='',myStudentCode='';
 let gameRef=null,localGame=null,unsubFn=null,joinRole=null,mcActiveTab='ctrl';
 let hhMyExp=null,hhMyRound=null,hhCum=0,hhHist=[];
 let cbSubmitted=false,cbMyRound=null,cbCum=0,cbHist=[];
@@ -299,6 +304,12 @@ function parseRoster(txt){
 }
 
 const STUDENT_DB={"MSC-5803":{"name":"PRIYAM PRIYADARSHI","group":1,"role":"hh"},"MSC-4811":{"name":"BHAWNA CHETIWAL","group":1,"role":"hh"},"MSC-6925":{"name":"RAJ SHAW","group":1,"role":"cb"},"MSC-5557":{"name":"SANTOSH KUMAR","group":1,"role":"hh"},"MSC-6514":{"name":"SAUBHIK BISWAS","group":1,"role":"hh"},"MSC-2654":{"name":"ASHISH","group":1,"role":"hh"},"MSC-8428":{"name":"ADARSH KUMAR","group":1,"role":"hh"},"MSC-4814":{"name":"SUDHANSHU PANDEY","group":1,"role":"hh"},"MSC-9279":{"name":"VANSH SINGLA","group":1,"role":"hh"},"MSC-2535":{"name":"TRISHA BALA","group":2,"role":"cb"},"MSC-1488":{"name":"JIGYASA RANGARE","group":2,"role":"hh"},"MSC-6635":{"name":"RITOBHASH DAW","group":2,"role":"hh"},"MSC-1750":{"name":"MEET KUMAR K CHAUHAN","group":2,"role":"hh"},"MSC-2584":{"name":"PRIYANSHU SINGH","group":2,"role":"hh"},"MSC-4733":{"name":"AMRITANSH ARYAN","group":2,"role":"hh"},"MSC-5374":{"name":"UMANG SHARMA","group":2,"role":"hh"},"MSC-6977":{"name":"DILKHUSH KUMAR","group":2,"role":"hh"},"MSC-3677":{"name":"HAQ NAWAZ NIZAMI","group":2,"role":"hh"},"MSC-4582":{"name":"SAINDHAVI DAS","group":3,"role":"hh"},"MSC-4432":{"name":"PRERANA SUTRADHAR","group":3,"role":"hh"},"MSC-4527":{"name":"RINKESH MALLIK","group":3,"role":"hh"},"MSC-8359":{"name":"MD IZHAR ALAM","group":3,"role":"hh"},"MSC-9751":{"name":"OM PATHAK","group":3,"role":"hh"},"MSC-5506":{"name":"SUPARNO SEN","group":3,"role":"cb"},"MSC-7873":{"name":"MOHAMMAD SARIM ANSARI","group":3,"role":"hh"},"MSC-4257":{"name":"AMISH PRASAD","group":3,"role":"hh"},"MSC-1106":{"name":"PIYUSH AGARWAL","group":3,"role":"hh"},"MSC-7912":{"name":"SAMRIDDHI","group":4,"role":"cb"},"MSC-1711":{"name":"CHETNA RAKESH JAIN","group":4,"role":"hh"},"MSC-2679":{"name":"ADITYA SATISH TAUR","group":4,"role":"hh"},"MSC-7227":{"name":"SOUMALLO BHADRA","group":4,"role":"hh"},"MSC-6820":{"name":"KAUSHIK SRIVASTAVA","group":4,"role":"hh"},"MSC-4657":{"name":"VISHAL KUMAR","group":4,"role":"hh"},"MSC-7201":{"name":"UJJWAL TIWARI","group":4,"role":"hh"},"MSC-2169":{"name":"ANISH SINGH","group":4,"role":"hh"},"MSC-4611":{"name":"MADHU SUDAN YADAV","group":4,"role":"hh"},"MSC-5012":{"name":"VEDIKA PATHAK","group":5,"role":"hh"},"MSC-3286":{"name":"PASHMEEN KAUR KALRA","group":5,"role":"hh"},"MSC-5741":{"name":"JAYSURYA S","group":5,"role":"hh"},"MSC-5552":{"name":"IMMANUEL JIJO","group":5,"role":"hh"},"MSC-1520":{"name":"SAURABH KUMAR","group":5,"role":"hh"},"MSC-5333":{"name":"SOURABH GAUTAM","group":5,"role":"hh"},"MSC-1409":{"name":"ARMAAN RANDHAWA","group":5,"role":"hh"},"MSC-2307":{"name":"PRANAV MANOJ NAIR","group":5,"role":"cb"},"MSC-3547":{"name":"ASHUTOSH PANDEY","group":5,"role":"hh"},"MSC-8527":{"name":"ISHANI MITRA","group":6,"role":"hh"},"MSC-5010":{"name":"YASH NANDAN","group":6,"role":"hh"},"MSC-2674":{"name":"MAKHREO ENOCH CHALAI","group":6,"role":"hh"},"MSC-5554":{"name":"ATHARVA DHAUNDIYAL","group":6,"role":"cb"},"MSC-9928":{"name":"HIMANSHU YADAV","group":6,"role":"hh"},"MSC-7924":{"name":"SAMPAD BANERJEE","group":6,"role":"hh"},"MSC-2139":{"name":"PROTIM GOGOI","group":6,"role":"hh"},"MSC-3615":{"name":"YASH TAYAL","group":6,"role":"hh"},"MSC-2424":{"name":"PAVITHRA M","group":7,"role":"hh"},"MSC-3664":{"name":"AMIT KUMAR","group":7,"role":"hh"},"MSC-4150":{"name":"NAMAN GUPTA","group":7,"role":"hh"},"MSC-7224":{"name":"ABHISHEK KUMAR","group":7,"role":"hh"},"MSC-9935":{"name":"AAKARSH JAIN","group":7,"role":"hh"},"MSC-2824":{"name":"PARTHIB SAHA","group":7,"role":"hh"},"MSC-9785":{"name":"ARYAN ANILKUMAR AKEN","group":7,"role":"hh"},"MSC-3803":{"name":"SAURABH YADAV","group":7,"role":"cb"},"MSC-3045":{"name":"PRIYANKA VERMA","group":8,"role":"hh"},"MSC-6881":{"name":"SOUMYADEEP SAHA","group":8,"role":"hh"},"MSC-7065":{"name":"SONAL KUMAR","group":8,"role":"hh"},"MSC-1434":{"name":"ANURAG JAIN","group":8,"role":"hh"},"MSC-2519":{"name":"AVINASH KUMAR","group":8,"role":"cb"},"MSC-2291":{"name":"SAHIL","group":8,"role":"hh"},"MSC-6574":{"name":"ARPAN BISWAS","group":8,"role":"hh"}};
+function getCBType(group){return group<=4?'IT':'DM';}
+function getCBPayoff(inflation,gap,group){
+  const t=getCBType(group);
+  if(t==='IT') return 20-Math.pow(inflation-2,2);
+  return 20-Math.pow(inflation-2,2)-0.25*Math.pow(gap,2);
+}
 function onCodeInput(){
   const val=$('jn-code').value.trim().toUpperCase();
   if(STUDENT_DB[val]){
@@ -339,7 +350,7 @@ async function joinGame(){
     const snap=await db.ref('games/'+roomCode).get();
     if(!snap.exists()){setErr('jn-err','Room code not found. Check with your instructor.');return;}
     localGame=snap.val();myCode=roomCode;gameRef=db.ref('games/'+roomCode);
-    const s=STUDENT_DB[raw];myRole=s.role;myGroup=s.group;myName=s.name;
+    const s=STUDENT_DB[raw];myRole=s.role;myGroup=s.group;myName=s.name;myStudentCode=raw;
     if(myRole==='cb'){$('cb-grp-badge').textContent='Group '+myGroup;showScreen('cb');subscribe(renderCB);}
     else{$('hh-grp-badge').textContent='Group '+myGroup;showScreen('hh');subscribe(renderHH);}
     return;
@@ -382,9 +393,9 @@ function renderMaster(g){
   $('mc-p3').style.display=g.phase==='cb_decision'?'block':'none';
   $('mc-p4').style.display=g.phase==='results'&&!g.gameOver?'block':'none';
   $('mc-over').style.display=g.gameOver?'block':'none';
-  if(g.phase==='expectation'){let s='';for(let gr=1;gr<=g.numGroups;gr++){const n=Object.values((g.groups&&g.groups[gr]&&g.groups[gr].households)||{}).length;s+='<span style="font-size:12px;color:'+(n>0?'#5abf8a':'#6b6254')+';margin-right:10px">Grp '+gr+': '+n+'/6</span>';}$('mc-hh-prog').innerHTML=s||'No submissions yet.';}
-  if(g.phase==='cb_decision'){let done=0,tot=0;for(let gr=1;gr<=g.numGroups;gr++){const grp=g.groups&&g.groups[gr];if(!grp)continue;tot++;if(grp.cbDecision!==null&&grp.cbDecision!==undefined)done++;}$('mc-cb-prog').textContent=done+' / '+tot+' groups finalised';$('mc-reveal-btn').style.display=(tot>0&&done===tot)?'block':'none';}
-  if(g.phase==='results'){let html='';for(let gr=1;gr<=g.numGroups;gr++){const grp=g.groups&&g.groups[gr];if(!grp||!grp.result)continue;const r=grp.result;html+='<div class="stat-row"><span class="sl">Group '+gr+'</span><span class="sv" style="font-size:12px">AvgExp='+f2(r.avgExp)+' Pi='+f2(r.inflation)+' Gap='+f2(r.gap)+' Pay='+f1(r.cbPayoff)+'</span></div>';}$('mc-res-body').innerHTML=html||'No results.';$('mc-next-btn').style.display=g.round<g.numRounds?'block':'none';}
+  if(g.phase==='expectation'){let s='';for(let gr=1;gr<=10;gr++){const n=Object.values((g.groups&&g.groups[gr]&&g.groups[gr].households)||{}).length;if(n>0)s+='<span style="font-size:12px;color:#5abf8a;margin-right:10px">Grp '+gr+': '+n+' submitted</span>';}$('mc-hh-prog').innerHTML=s||'No submissions yet.';}
+  if(g.phase==='cb_decision'){let done=0,tot=0;for(let gr=1;gr<=10;gr++){const grp=g.groups&&g.groups[gr];if(!grp||!Object.values(grp.households||{}).length)continue;tot++;if(grp.cbDecision!==null&&grp.cbDecision!==undefined)done++;}$('mc-cb-prog').textContent=done+' / '+tot+' groups finalised';$('mc-reveal-btn').style.display=(tot>0&&done===tot)?'block':'none';}
+  if(g.phase==='results'){let html='';for(let gr=1;gr<=10;gr++){const grp=g.groups&&g.groups[gr];if(!grp||!grp.result)continue;const r=grp.result;html+='<div class="stat-row"><span class="sl">Group '+gr+'</span><span class="sv" style="font-size:12px">AvgExp='+f2(r.avgExp)+' Pi='+f2(r.inflation)+' Gap='+f2(r.gap)+' Pay='+f1(r.cbPayoff)+'</span></div>';}$('mc-res-body').innerHTML=html||'No results.';$('mc-next-btn').style.display=g.round<g.numRounds?'block':'none';}
   if(mcActiveTab==='codes')renderCodes(g);if(mcActiveTab==='groups')renderGroups(g);if(mcActiveTab==='board')renderBoard(g);if(mcActiveTab==='data')renderData(g);
 }
 function renderCodes(g){
@@ -401,8 +412,15 @@ function copyAllCodes(){
 }
 function renderGroups(g){
   let html='',count=0;
-  for(let gr=1;gr<=g.numGroups;gr++){const grp=(g.groups&&g.groups[gr])||{};const hhs=Object.values(grp.households||{}).length;const cbOk=grp.cbDecision!==null&&grp.cbDecision!==undefined;count++;html+='<div class="grp-status"><span style="color:#c0b8a8">Group '+gr+'</span><div style="display:flex;gap:5px"><span class="badge '+(hhs>0?'b-green':'b-gray')+'">'+hhs+'/6 HH</span><span class="badge '+(cbOk?'b-green':'b-gray')+'">'+(cbOk?'CB v':'CB -')+'</span></div></div>';}
-  $('mc-grp-count').textContent=count;$('mc-groups-body').innerHTML=html;
+  for(let gr=1;gr<=10;gr++){
+    const grp=(g.groups&&g.groups[gr]);
+    if(!grp&&!(g.numGroups>=gr))continue;
+    const hhs=Object.values((grp&&grp.households)||{}).length;
+    const cbOk=grp&&grp.cbDecision!==null&&grp.cbDecision!==undefined;
+    if(!grp&&hhs===0)continue;
+    count++;html+='<div class="grp-status"><span style="color:#c0b8a8">Group '+gr+'</span><div style="display:flex;gap:5px"><span class="badge '+(hhs>0?'b-green':'b-gray')+'">'+hhs+' HH</span><span class="badge '+(cbOk?'b-green':'b-gray')+'">'+(cbOk?'CB v':'CB -')+'</span></div></div>';
+  }
+  $('mc-grp-count').textContent=count;$('mc-groups-body').innerHTML=html||'<div style="font-size:13px;color:#4a4840;padding:12px 0">No groups joined yet</div>';
 }
 function renderBoard(g){
   const scores={};(g.history||[]).forEach(h=>{scores[h.group]=(scores[h.group]||0)+h.cbPayoff;});
@@ -422,52 +440,95 @@ async function mcAdvance(){await gameRef.update({phase:'shock'});}
 async function mcReleaseShock(){
   const shock=parseFloat($('mc-shock-in').value);if(isNaN(shock)){toast('Enter a shock value first');return;}
   const g=localGame;const updates={phase:'cb_decision',shock};
-  for(let gr=1;gr<=g.numGroups;gr++){updates['groups/'+gr+'/cbDecision']=null;updates['groups/'+gr+'/result']=null;if(!g.groups||!g.groups[gr]||g.groups[gr].interestRate===undefined)updates['groups/'+gr+'/interestRate']=g.baseRate;}
+  for(let gr=1;gr<=10;gr++){
+    if(!g.groups||!g.groups[gr])continue;
+    updates['groups/'+gr+'/cbDecision']=null;updates['groups/'+gr+'/result']=null;
+    if(g.groups[gr].interestRate===undefined)updates['groups/'+gr+'/interestRate']=g.baseRate;
+  }
   await gameRef.update(updates);toast('Shock released!');
 }
 async function mcReveal(){
   const g=localGame;const updates={};const histEntries=[];
   const newAvgExp=JSON.parse(JSON.stringify(g.avgExpHistory||{}));newAvgExp[g.round]={};
-  for(let gr=1;gr<=g.numGroups;gr++){
+  // Build lookup: studentCode -> name for HH data
+  for(let gr=1;gr<=10;gr++){
     const grp=g.groups&&g.groups[gr];if(!grp||grp.cbDecision===null||grp.cbDecision===undefined)continue;
-    const hhs=Object.values(grp.households||{});const avgExp=hhs.length>0?hhs.reduce((a,b)=>a+b,0)/hhs.length:2;
+    const hhEntries=grp.households||{};
+    const hhVals=Object.values(hhEntries);
+    const avgExp=hhVals.length>0?hhVals.reduce((a,b)=>a+b,0)/hhVals.length:2;
     newAvgExp[g.round][gr]=+avgExp.toFixed(4);
     const prevRate=grp.interestRate!==undefined?grp.interestRate:g.baseRate;
-    const newRate=prevRate+grp.cbDecision;const gap=2+g.shock-newRate;const inflation=avgExp+0.25*gap;const cbPayoff=20-Math.pow(inflation-2,2);
-    const result={inflation:+inflation.toFixed(4),gap:+gap.toFixed(4),rate:+newRate.toFixed(4),cbPayoff:+cbPayoff.toFixed(4),shock:g.shock,avgExp:+avgExp.toFixed(4)};
+    const newRate=prevRate+grp.cbDecision;
+    const gap=2+g.shock-newRate;
+    const inflation=avgExp+0.25*gap;
+    const cbType=getCBType(gr);
+    const cbPayoff=getCBPayoff(inflation,gap,gr);
+    const inflPen=+Math.pow(inflation-2,2).toFixed(4);
+    const gapPen=cbType==='DM'?+( 0.25*Math.pow(gap,2)).toFixed(4):0;
+    const result={inflation:+inflation.toFixed(4),gap:+gap.toFixed(4),rate:+newRate.toFixed(4),cbPayoff:+cbPayoff.toFixed(4),shock:g.shock,avgExp:+avgExp.toFixed(4),cbType,inflPen,gapPen};
     updates['groups/'+gr+'/result']=result;updates['groups/'+gr+'/interestRate']=newRate;
-    histEntries.push({round:g.round,group:gr,inflation:result.inflation,gap:result.gap,rate:result.rate,cbPayoff:result.cbPayoff,shock:result.shock,avgExp:result.avgExp,hhCount:hhs.length});
+    // Individual HH records
+    const hhRecords=[];
+    Object.entries(hhEntries).forEach(([uid,exp])=>{
+      const hhPay=Math.max(0,10-Math.abs(exp-inflation));
+      const studentInfo=STUDENT_DB[uid];
+      const hhName=studentInfo?studentInfo.name:uid;
+      hhRecords.push({uid,name:hhName,exp:+exp.toFixed(4),payoff:+hhPay.toFixed(4)});
+    });
+    histEntries.push({round:g.round,group:gr,cbType,inflation:result.inflation,gap:result.gap,rate:result.rate,cbPayoff:result.cbPayoff,inflPen,gapPen,shock:result.shock,avgExp:result.avgExp,hhCount:hhVals.length,hhRecords});
   }
   updates.phase='results';updates.history=[...(g.history||[]),...histEntries];updates.avgExpHistory=newAvgExp;
   await gameRef.update(updates);toast('Results revealed!');
 }
 async function mcNext(){
   const g=localGame;const updates={round:g.round+1,phase:'expectation',shock:null};
-  for(let gr=1;gr<=g.numGroups;gr++){updates['groups/'+gr+'/households']={};updates['groups/'+gr+'/cbDecision']=null;updates['groups/'+gr+'/result']=null;}
+  for(let gr=1;gr<=10;gr++){
+    if(!g.groups||!g.groups[gr])continue;
+    updates['groups/'+gr+'/households']={};updates['groups/'+gr+'/cbDecision']=null;updates['groups/'+gr+'/result']=null;
+  }
   await gameRef.update(updates);toast('Round '+(g.round+1)+' started!');
 }
 async function mcEnd(){await gameRef.update({gameOver:true});}
 async function mcReset(){
   if(!confirm('Reset game? All data cleared.'))return;const g=localGame;
-  await gameRef.set({code:g.code,round:1,phase:'expectation',baseRate:2,shock:null,numGroups:g.numGroups,numRounds:g.numRounds,groups:{},history:[],avgExpHistory:{},roster:g.roster||{},gameOver:false,createdAt:Date.now()});
+  await gameRef.set({code:g.code,round:1,phase:'expectation',baseRate:2,shock:null,numGroups:10,numRounds:g.numRounds,groups:{},history:[],avgExpHistory:{},roster:g.roster||{},gameOver:false,createdAt:Date.now()});
   toast('Game reset!');
 }
 function doExcel(){
   const g=localGame;if(!g){toast('No data');return;}const wb=XLSX.utils.book_new();
-  const hist=(g.history||[]).map(h=>({'Round':h.round,'Group':h.group,'Avg Exp':+f2(h.avgExp),'Shock':+f2(h.shock||0),'Interest Rate':+f2(h.rate||0),'Inflation':+f2(h.inflation||0),'Output Gap':+f2(h.gap||0),'CB Payoff':+f1(h.cbPayoff||0),'HH Count':h.hhCount||0}));
+  // Sheet 1: Round History (group level)
+  const hist=(g.history||[]).map(h=>({'Round':h.round,'Group':h.group,'CB Type':h.cbType||'IT','Avg Exp':+f2(h.avgExp),'Shock':+f2(h.shock||0),'Interest Rate':+f2(h.rate||0),'Inflation':+f2(h.inflation||0),'Output Gap':+f2(h.gap||0),'CB Payoff':+f1(h.cbPayoff||0),'Infl Penalty':+f2(h.inflPen||0),'Gap Penalty':+f2(h.gapPen||0),'HH Count':h.hhCount||0}));
   const ws1=XLSX.utils.json_to_sheet(hist);XLSX.utils.book_append_sheet(wb,ws1,'Round History');
+  // Sheet 2: Individual HH data
+  const hhRows=[];
+  (g.history||[]).forEach(h=>{
+    if(!h.hhRecords)return;
+    h.hhRecords.forEach(hh=>{
+      // Look up student name from STUDENT_DB by uid (uid is firebase key = myId, not MSC code)
+      // We store what we can: group, round, exp, payoff
+      hhRows.push({'Round':h.round,'Group':h.group,'CB Type':h.cbType||'IT','MSC Code':hh.uid,'Student Name':hh.name||hh.uid,'Expectation':hh.exp,'Actual Inflation':+f2(h.inflation),'HH Payoff':+f2(hh.payoff),'Shock':+f2(h.shock||0),'Interest Rate':+f2(h.rate||0),'Output Gap':+f2(h.gap||0)});
+    });
+  });
+  if(hhRows.length){const ws5=XLSX.utils.json_to_sheet(hhRows);XLSX.utils.book_append_sheet(wb,ws5,'HH Individual Data');}
+  // Sheet 3: Avg Expectations
   const expH=g.avgExpHistory||{};const expRows=[];
-  for(let r=1;r<=g.round;r++){const row={Round:r};for(let gr=1;gr<=g.numGroups;gr++){row['Group '+gr]=(expH[r]&&expH[r][gr]!==undefined)?+f2(expH[r][gr]):'';}expRows.push(row);}
+  for(let r=1;r<=g.round;r++){const row={Round:r};for(let gr=1;gr<=10;gr++){row['Group '+gr]=(expH[r]&&expH[r][gr]!==undefined)?+f2(expH[r][gr]):'';}expRows.push(row);}
   const ws2=XLSX.utils.json_to_sheet(expRows);XLSX.utils.book_append_sheet(wb,ws2,'Avg Expectations');
+  // Sheet 4: Leaderboard
   const scores={};(g.history||[]).forEach(h=>{scores[h.group]=(scores[h.group]||0)+h.cbPayoff;});
-  const lb=Object.entries(scores).sort((a,b)=>b[1]-a[1]).map(([gr,sc],i)=>({Rank:i+1,Group:+gr,'Cumulative CB Payoff':+f1(sc)}));
+  const lb=Object.entries(scores).sort((a,b)=>b[1]-a[1]).map(([gr,sc],i)=>({Rank:i+1,Group:+gr,'CB Type':getCBType(+gr),'Cumulative CB Payoff':+f1(sc)}));
   const ws3=XLSX.utils.json_to_sheet(lb);XLSX.utils.book_append_sheet(wb,ws3,'Leaderboard');
-  const roster=g.roster||{};const rosterRows=Object.entries(roster).map(([suf,info])=>({Name:info.name,Group:info.group,Role:info.role,'Personal Code':g.code+'-'+suf}));
-  if(rosterRows.length){const ws4=XLSX.utils.json_to_sheet(rosterRows);XLSX.utils.book_append_sheet(wb,ws4,'Roster');}
+  // Sheet 5: Student roster from STUDENT_DB
+  const rosterRows=Object.entries(STUDENT_DB).map(([code,s])=>({'MSC Code':code,'Name':s.name,'Group':s.group,'Role':s.role,'CB Type':getCBType(s.group)}));
+  const ws4=XLSX.utils.json_to_sheet(rosterRows);XLSX.utils.book_append_sheet(wb,ws4,'Roster');
   XLSX.writeFile(wb,'macro_game_'+g.code+'.xlsx');toast('Excel downloaded!');
 }
 function renderCB(g){
   if(!g)return;const grp=(g.groups&&g.groups[myGroup])||{};const curRate=grp.interestRate!==undefined?grp.interestRate:g.baseRate;
+  const cbType=getCBType(myGroup);
+  // Show mandate badge always
+  const mb=$('cb-mandate-badge');mb.style.display='block';
+  mb.innerHTML=cbType==='IT'?'<span class="badge b-gold" style="font-size:13px;padding:6px 14px">Inflation Targeting</span>':'<span class="badge b-blue" style="font-size:13px;padding:6px 14px">Dual Mandate</span>';
   if(cbMyRound!==g.round){cbMyRound=g.round;cbSubmitted=false;$('cb-delta-in').value='';$('cb-prev').style.display='none';$('cb-fin-btn').disabled=true;}
   if(g.gameOver){show3cb('wait');$('cb-wait-msg').textContent='Game over!';return;}
   if(g.phase==='expectation'){show3cb('wait');const n=Object.values(grp.households||{}).length;$('cb-wait-msg').textContent='Waiting for households to submit expectations...';$('cb-wait-sub').textContent=n>0?n+'/6 submitted':'';return;}
@@ -479,9 +540,15 @@ function renderCB(g){
   if(cbSubmitted&&g.phase!=='results'){show3cb('wait');$('cb-wait-msg').textContent='Decision submitted. Waiting for master...';$('cb-wait-sub').textContent='';return;}
   if(g.phase==='results'&&grp.result){
     show3cb('res');const r=grp.result;
-    if(!cbHist.find(h=>h.round===g.round)){cbHist.push({round:g.round,shock:r.shock,rate:r.rate,inflation:r.inflation,gap:r.gap,payoff:r.cbPayoff});cbCum+=r.cbPayoff;}
+    if(!cbHist.find(h=>h.round===g.round)){cbHist.push({round:g.round,shock:r.shock,rate:r.rate,inflation:r.inflation,gap:r.gap,payoff:r.cbPayoff,cbType});cbCum+=r.cbPayoff;}
     $('cb-res-badge').textContent='Round '+g.round+' complete';$('cb-r-rate').textContent=f2(r.rate)+'%';$('cb-r-gap').textContent=f2(r.gap);$('cb-r-inf').textContent=f2(r.inflation)+'%';$('cb-r-cum').textContent=f1(cbCum);
-    const pn=$('cb-pay-num');pn.textContent=f1(r.cbPayoff);pn.style.color=clr(r.cbPayoff);renderCBHist('cb-hist');
+    const pn=$('cb-pay-num');pn.textContent=f1(r.cbPayoff);pn.style.color=clr(r.cbPayoff);
+    if(cbType==='DM'){
+      const inflPen=Math.pow(r.inflation-2,2);const gapPen=0.25*Math.pow(r.gap,2);
+      $('cb-r-infl-pen-row').style.display='flex';$('cb-r-gap-pen-row').style.display='flex';
+      $('cb-r-infl-pen').textContent='-'+f2(inflPen);$('cb-r-gap-pen').textContent='-'+f2(gapPen);
+    } else {$('cb-r-infl-pen-row').style.display='none';$('cb-r-gap-pen-row').style.display='none';}
+    renderCBHist('cb-hist');
   }
 }
 function show3cb(w){['wait','decide','res'].forEach(k=>$('cb-'+k).style.display=k===w?'block':'none');}
@@ -491,8 +558,16 @@ function cbPreview(){
   if(isNaN(delta)||!localGame||localGame.shock===null||localGame.shock===undefined){$('cb-prev').style.display='none';$('cb-fin-btn').disabled=true;return;}
   const g=localGame,grp=(g.groups&&g.groups[myGroup])||{};const cur=grp.interestRate!==undefined?grp.interestRate:g.baseRate;
   const hhs=Object.values(grp.households||{});const avg=hhs.length>0?hhs.reduce((a,b)=>a+b,0)/hhs.length:2;
-  const newRate=cur+delta,gap=2+g.shock-newRate,inf=avg+0.25*gap,pay=20-Math.pow(inf-2,2);
-  $('cb-prev').style.display='block';$('pv-rate').textContent=f2(newRate)+'%';$('pv-gap').textContent=f2(gap);$('pv-inf').textContent=f2(inf)+'%';$('pv-pay').textContent=f2(pay);$('pv-pay').style.color=clr(pay);$('cb-fin-btn').disabled=false;
+  const newRate=cur+delta,gap=2+g.shock-newRate,inf=avg+0.25*gap;
+  const pay=getCBPayoff(inf,gap,myGroup);
+  const cbType=getCBType(myGroup);
+  $('cb-prev').style.display='block';$('pv-rate').textContent=f2(newRate)+'%';$('pv-gap').textContent=f2(gap);$('pv-inf').textContent=f2(inf)+'%';$('pv-pay').textContent=f2(pay);$('pv-pay').style.color=clr(pay);
+  if(cbType==='DM'){
+    const inflPen=Math.pow(inf-2,2);const gapPen=0.25*Math.pow(gap,2);
+    $('pv-infl-pen-row').style.display='flex';$('pv-gap-pen-row').style.display='flex';
+    $('pv-infl-pen').textContent='-'+f2(inflPen);$('pv-gap-pen').textContent='-'+f2(gapPen);
+  } else {$('pv-infl-pen-row').style.display='none';$('pv-gap-pen-row').style.display='none';}
+  $('cb-fin-btn').disabled=false;
 }
 async function cbFinalise(){
   const delta=parseFloat($('cb-delta-in').value);if(isNaN(delta)){toast('Enter a valid change');return;}
@@ -517,7 +592,8 @@ function renderHHHist(tid){const tbody=$(tid);if(!tbody)return;tbody.innerHTML='
 async function hhSubmit(){
   const val=parseFloat($('hh-exp-in').value);if(isNaN(val)){toast('Enter a valid number');return;}
   if(localGame.phase!=='expectation'){toast('Expectation phase is over');return;}
-  await gameRef.child('groups/'+myGroup+'/households/'+myId).set(val);
+  const hhKey=myStudentCode||myId;
+  await gameRef.child('groups/'+myGroup+'/households/'+hhKey).set(val);
   hhMyExp=val;$('hh-sub-btn').disabled=true;toast('Submitted!');show3hh('wait');$('hh-sub-echo').textContent='Your expectation: '+f2(val)+'%';renderHHHist('hh-hist-wait');$('hh-hist-wait-card').style.display=hhHist.length?'block':'none';
 }
 function renderSpectator(g){
