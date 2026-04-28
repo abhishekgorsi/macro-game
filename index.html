@@ -328,6 +328,7 @@ function selRole(role,el){
   joinRole=role;document.querySelectorAll('.rc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
   $('jn-grp-row').style.display=(role==='cb'||role==='hh')?'block':'none';
   $('jn-name-row').style.display=role==='hh'?'block':'none';
+  if(role==='cb'||role==='hh'){$('jn-group').focus();}
 }
 async function createGame(){
   const numGroups=parseInt($('cr-ng').value);const numRounds=parseInt($('cr-nr').value);
